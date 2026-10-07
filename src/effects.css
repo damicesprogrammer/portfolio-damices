@@ -1,0 +1,219 @@
+/*
+ * Experimental motion effects — one self-contained block per effect.
+ * To remove an effect: delete its block and the matching class / data
+ * attribute in the JSX. JS helpers live in components/portfolio/effects.tsx.
+ *
+ * Everything that moves is wrapped in prefers-reduced-motion: no-preference,
+ * and everything cursor-driven in (hover: hover) and (pointer: fine).
+ */
+
+:root {
+  --fx-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------------
+ * 1. Scroll reveal
+ * `data-reveal` on a container: its direct children rise in, in sequence.
+ * `.fx` is added to <html> by an inline script in routes/__root.tsx, so
+ * content is never hidden when JS is unavailable.
+ * ------------------------------------------------------------------------- */
+@keyframes fx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fx [data-reveal]:not([data-revealed]) > * {
+    opacity: 0;
+  }
+  .fx [data-revealed="anim"] > * {
+    animation: fx-rise 0.7s var(--fx-ease) backwards;
+  }
+  .fx [data-revealed="anim"] > :nth-child(2) {
+    animation-delay: 90ms;
+  }
+  .fx [data-revealed="anim"] > :nth-child(3) {
+    animation-delay: 180ms;
+  }
+  .fx [data-revealed="anim"] > :nth-child(4) {
+    animation-delay: 270ms;
+  }
+  .fx [data-revealed="anim"] > :nth-child(n + 5) {
+    animation-delay: 360ms;
+  }
+
+  /* Hero entrance on page load (pure CSS, no JS needed) */
+  .fx-hero > :not(.fx-hero-glow) {
+    animation: fx-rise 0.8s var(--fx-ease) backwards;
+  }
+  .fx-hero > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .fx-hero > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+  .fx-hero > :nth-child(4) {
+    animation-delay: 240ms;
+  }
+  .fx-hero > :nth-child(n + 5) {
+    animation-delay: 320ms;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. Hero spotlight
+ * A large, faint glow following the cursor; fades out when the cursor stops.
+ * Tune: --fx-glow-size, --fx-glow-strength.
+ * ------------------------------------------------------------------------- */
+.fx-hero {
+  --fx-glow-size: 720px;
+  --fx-glow-strength: 12%;
+}
+.fx-hero-glow {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .fx-hero-glow {
+    display: block;
+    position: absolute;
+    inset-block: 0;
+    left: calc(50% - 50vw);
+    width: 100vw;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .fx-hero-glow::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--fx-glow-size);
+    height: var(--fx-glow-size);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle closest-side,
+      color-mix(in oklch, var(--primary) var(--fx-glow-strength), transparent),
+      transparent
+    );
+    transform: translate(calc(var(--fx-cx, 50vw) - 50%), calc(var(--fx-y, 0px) - 50%));
+    opacity: 0;
+    transition:
+      transform 0.6s var(--fx-ease),
+      opacity 1.4s ease;
+    will-change: transform;
+  }
+  .fx-hero[data-fx-moving] .fx-hero-glow::before {
+    opacity: 1;
+    transition:
+      transform 0.6s var(--fx-ease),
+      opacity 0.5s ease;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. Project card — hover lift + very light 3D tilt
+ * Tune: --fx-tilt (max rotation), --fx-lift.
+ * ------------------------------------------------------------------------- */
+.fx-card {
+  --fx-tilt: 1.6deg;
+  --fx-lift: 5px;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .fx-card {
+    transform: perspective(1400px) rotateX(calc(var(--fx-py, 0) * var(--fx-tilt) * -2))
+      rotateY(calc(var(--fx-px, 0) * var(--fx-tilt) * 2)) translateY(0);
+    transition:
+      transform 0.5s var(--fx-ease),
+      box-shadow 0.4s ease,
+      border-color 0.4s ease;
+  }
+  .fx-card:hover {
+    transform: perspective(1400px) rotateX(calc(var(--fx-py, 0) * var(--fx-tilt) * -2))
+      rotateY(calc(var(--fx-px, 0) * var(--fx-tilt) * 2)) translateY(calc(var(--fx-lift) * -1));
+    border-inline-color: color-mix(in oklch, var(--primary) 30%, var(--border));
+    border-bottom-color: color-mix(in oklch, var(--primary) 30%, var(--border));
+    box-shadow:
+      0 18px 40px -22px color-mix(in oklch, var(--primary) 45%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--primary) 8%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. Navbar glass — translucent + blurred once the page is scrolled
+ * ------------------------------------------------------------------------- */
+.fx-nav {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.fx-nav[data-scrolled] {
+  background-color: color-mix(in oklch, var(--background) 75%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom-color: color-mix(in oklch, var(--border) 70%, transparent);
+  box-shadow: 0 1px 16px -10px oklch(0.27 0.01 260 / 0.15);
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. Buttons — smooth transitions, slight lift, arrow nudge, cursor glow on
+ * primary buttons. Focus ring from Tailwind is untouched.
+ * ------------------------------------------------------------------------- */
+.fx-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s var(--fx-ease);
+}
+.fx-btn:hover {
+  border-color: color-mix(in oklch, var(--primary) 35%, var(--border));
+}
+.fx-arrow {
+  transition: transform 0.25s var(--fx-ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fx-btn:hover:not(:focus-visible) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -8px color-mix(in oklch, var(--foreground) 35%, transparent);
+  }
+  .fx-btn:active:not(:focus-visible) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+    transition-duration: 0.08s;
+  }
+  .fx-btn:hover .fx-arrow {
+    transform: translateX(3px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .fx-btn-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      90px circle at var(--fx-x, 50%) var(--fx-y, 50%),
+      oklch(1 0 0 / 0.18),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .fx-btn-glow:hover::after {
+    opacity: 1;
+  }
+}

@@ -2,6 +2,7 @@ import { Fragment, useState, type ReactNode } from "react";
 import { Mail, ArrowRight, Menu, X, GraduationCap, Check } from "lucide-react";
 import { profile, type Lang } from "@/content/portfolio";
 import { useLanguage } from "./language";
+import { useScrolled } from "./effects";
 
 function GithubIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -20,7 +21,7 @@ function LinkedinIcon({ className = "h-4 w-4" }: { className?: string }) {
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-20 border-t border-border py-16 md:py-24">
+    <section id={id} data-reveal className="scroll-mt-20 border-t border-border py-16 md:py-24">
       <h2 className="mb-10 font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
         {title}
       </h2>
@@ -38,8 +39,8 @@ function Tag({ children }: { children: ReactNode }) {
 }
 
 const btn =
-  "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-const btnPrimary = `${btn} bg-foreground text-background hover:bg-foreground/85`;
+  "fx-btn inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const btnPrimary = `${btn} fx-btn-glow bg-foreground text-background hover:bg-foreground/85`;
 const btnOutline = `${btn} border border-border bg-card text-foreground hover:bg-accent`;
 const external = { target: "_blank", rel: "noreferrer" } as const;
 
@@ -76,8 +77,12 @@ function LanguageToggle() {
 export function Header() {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const scrolled = useScrolled();
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background">
+    <header
+      data-scrolled={scrolled || undefined}
+      className="fx-nav sticky top-0 z-50 border-b border-border bg-background"
+    >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-5">
         <a href="#top" className="font-semibold tracking-tight" onClick={() => setOpen(false)}>
           {profile.name}
@@ -148,7 +153,7 @@ export function Header() {
 export function Hero() {
   const { t } = useLanguage();
   return (
-    <section id="top" className="py-20 md:py-32">
+    <section id="top" data-fx-pointer className="fx-hero relative isolate py-20 md:py-32">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
         {/* keep each item on one line so wrapping only happens between items */}
         {t.hero.eyebrow.split(" · ").map((item, i) => (
@@ -167,7 +172,7 @@ export function Hero() {
       <p className="mt-6 max-w-2xl leading-relaxed text-muted-foreground">{t.hero.intro}</p>
       <div className="mt-9 flex flex-wrap gap-3">
         <a href="#projects" className={btnPrimary}>
-          {t.hero.ctaProjects} <ArrowRight className="h-4 w-4" />
+          {t.hero.ctaProjects} <ArrowRight className="fx-arrow h-4 w-4" />
         </a>
         <a href="#contact" className={btnOutline}>
           {t.hero.ctaContact}
@@ -180,6 +185,7 @@ export function Hero() {
         <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />
         {t.hero.current}
       </p>
+      <div className="fx-hero-glow" aria-hidden="true" />
     </section>
   );
 }
@@ -253,7 +259,10 @@ export function Projects() {
   const p = t.projects.featured;
   return (
     <Section id="projects" title={t.projects.title}>
-      <article className="rounded-lg border border-border border-t-2 border-t-primary bg-card p-6 shadow-sm md:p-10">
+      <article
+        data-fx-pointer
+        className="fx-card rounded-lg border border-border border-t-2 border-t-primary bg-card p-6 shadow-sm md:p-10"
+      >
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
           {t.projects.featuredLabel}
         </p>
@@ -300,7 +309,7 @@ export function Skills() {
   const { t } = useLanguage();
   return (
     <Section id="skills" title={t.skills.title}>
-      <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-reveal className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {t.skills.groups.map((g) => (
           <div key={g.name}>
             <h3 className="mb-3 text-sm font-semibold">{g.name}</h3>

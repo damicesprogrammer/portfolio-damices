@@ -98,10 +98,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// Enables the scroll-reveal styles (src/effects.css) before first paint. If the
+// app never hydrates, the class is removed so content can't stay hidden.
+const motionScript = `if("IntersectionObserver"in window){var d=document.documentElement;d.classList.add("fx");setTimeout(function(){if(!("fxReady"in d.dataset))d.classList.remove("fx")},4000)}`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: motionScript }} />
         <HeadContent />
       </head>
       <body>

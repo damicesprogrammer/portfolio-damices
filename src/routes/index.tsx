@@ -11,6 +11,7 @@ import {
   Footer,
 } from "@/components/portfolio/Portfolio";
 import { LanguageProvider } from "@/components/portfolio/language";
+import { MotionEffects } from "@/components/portfolio/effects";
 
 const title = "Augusto D' Amices — Python, Machine Learning & AI Engineering";
 const description =
@@ -33,7 +34,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <LanguageProvider>
-      <div className="min-h-screen">
+      <MotionEffects />
+      <div className="min-h-screen overflow-x-clip">
         <Header />
         <main className="mx-auto max-w-5xl px-5">
           <Hero />
