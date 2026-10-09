@@ -305,7 +305,7 @@ export const content: Record<Lang, Content> = {
       title: "Contact",
 
       text:
-        "Open to opportunities and conversations about AI engineering, Machine Learning, backend and data systems, databases and system integration. The best way to reach me is by email.",
+        "Interested in discussing AI, Machine Learning, backend development, databases, system integration, or any of the projects featured here? Feel free to reach out with questions, ideas, or to discuss technical approaches and implementations. The best way to contact me is by email.",
 
       email: "Send an email",
     },
@@ -512,7 +512,7 @@ export const content: Record<Lang, Content> = {
       title: "Contato",
 
       text:
-        "Aberto a oportunidades e conversas sobre engenharia de IA, Machine Learning, sistemas backend e de dados, bancos de dados e integração de sistemas. A melhor forma de entrar em contato comigo é por e-mail.",
+        "Quer conversar sobre IA, Machine Learning, desenvolvimento backend, bancos de dados, integração de sistemas ou algum dos projetos apresentados aqui? Fique à vontade para entrar em contato com dúvidas, ideias ou para discutir abordagens técnicas e implementações. A melhor forma de falar comigo é por e-mail.",
 
       email: "Enviar e-mail",
     },
